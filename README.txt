@@ -1,3 +1,8 @@
+# Small Instruction Register Processor
+
+Building a our own microprocessor with constraints
+
+
 1.	Explain which programs/features work 
 All of all programs and features worked as we wanted/designed.
 Our testbenches are labelled as:
