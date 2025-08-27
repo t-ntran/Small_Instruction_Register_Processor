@@ -1,0 +1,339 @@
+set #0001, $0		//:Loop 
+lsl $0, #4
+set #1110, $0		//$0 = 30
+cpy $0 $1		//$1 = 30
+set #0101 $0
+lsl $0 #4
+set #1011 $0	//branch by 91 on the way to the end
+beq $1, $7 //compare current index with max (30)	to line 99. 99 - 8 = 91 = 01011011
+addi $7 #15 //update index and load messages
+addi $0 #15		//$0 = currIter + 30
+load $0		//$0 = message0
+cpy $0 $5		//$5 = message0
+addi $7 #1		//$0 = currIter+1
+cpy $0 $7		//increment currIter
+addi $7 #15
+addi $0 #15		//offset by 30 to index load
+load $0
+cpy $0 $6		//$6 = message1
+addi $7 #1
+cpy $0 $7		//increment index
+lsl $6 #4   //s_parity8	    //$4 will be used to collect parity bits 1, 2, 4, 8
+lsr $0 #4
+lsr $0 #1	//$0 = message1(4,6)
+cpy $0 $1	//$1 = message1(4,6)
+lsr $6 #4	//$0 = message1(0,3)
+xor $0 $1        //$0 = 4 bit xor res
+Cpy $0 $1	//$1 = 4 bit xor res
+lsr $0 #1
+lsr $0 #1	//$0 = 2 bit to xor
+cpy $0 $2	//$2 = 2 bit to xor
+andi $1 #3	//$0 = 2 bit to xor
+xor $0 $2	//$0 = 2 bit xor result
+cpy $0 $1	//$1 = 2 bit xor result
+lsr $0 #1	//$0 = 1 bit to xor
+cpy $0 $2	//$2 = 1 bit to xor
+andi $1 #1	//$0 = 1 bit to xor
+xor $0 $2	//$0 = s_p8
+lsl $0 #1	//$0 = 000000 s_p8 0
+cpy $0 $4	//$4 = 000000 s_p8 0
+lsr $5 #4   //s_parity4
+lsr $0 #1	//$0 = m0(0,2)
+cpy $0 $1	//$1 = m0(0,2)
+lsr $6 #4	//$0 = m1(0,3)
+xor $0 $1	//$0 = 4 bit xor result
+Cpy $0 $1	//$1 = 4 bit xor res
+lsr $0 #1
+lsr $0 #1	//$0 = 2 bit to xor
+cpy $0 $2	//$2 = 2 bit to xor
+andi $1 #3	//$0 = 2 bit to xor
+xor $0 $2	//$0 = 2 bit xor result
+cpy $0 $1	//$1 = 2 bit xor result
+lsr $0 #1	//$0 = 1 bit to xor
+cpy $0 $2	//$2 = 1 bit to xor
+andi $1 #1	//$0 = 1 bit to xor
+xor $0 $2	//$0 = s_p4
+add $0 $4	//$0 = 000000 s_p8 s_p4
+lsl $0 #1	//$0 = 00000 s_p8 s_p4 0
+cpy $0 $4	//$4 = 00000 s_p8 s_p4 0
+lsr $5 #4   //s_parity2
+lsr $0 #1
+lsr $0 #1	//$0 = message0(0,1)
+cpy $0 $1	//$1 = message0(0,1)
+lsr $5 #1
+lsr $0 #1
+lsr $0 #1
+andi $0 #1	//$0 = message0(4)
+xor $0 $1	//$0 = 2 bit xor result from message0
+cpy $0 $1	//$1 = 2 bit xor result from message0
+lsr $6 #4
+lsr $0 #1
+lsr $0 #1	//$0 = message1(0,1)
+xor $0 $1	//$0 = 2 bit xor result missing m1(4,5)
+cpy $0 $1	//$1 = 2 bit xor result missing m1(4,5)
+lsl $6 #4
+lsr $0 #4
+lsr $0 #1
+lsr $0 #1	//$0 = message1(4,5)
+xor $0 $1	//2 bit xor result
+cpy $0 $1	//$1 = 2 bit xor result
+lsr $0 #1	//1 bit to xor
+cpy $0 $2	//$2 = 1 bit to xor
+andi $1 #1	//$0 = 1 bit to xor
+xor $0 $2	//$0 = s_p2
+add $0 $4	//$0 = 00000 s_p8 s_p4 s_p2
+lsl $0 #1	//$0 = 0000 s_p8 s_p4 s_p2 0
+cpy $0 $4	//$4 = 0000 s_p8 s_p4 s_p2 0
+set #0000 $0            //Branch checkpoint to top
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down                            
+set #1010 $0              //                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsl $0 #4
+set #0011 $0
+beq $0 $0   //from bottom upwards to line 0. 94 - 0 = 94. 128 - 94 = 34. -34 2's complement = 10100010
+set #0000 $0            //Branch checkpoint to bottom
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down
+set #0101 $0                                   //                                     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+lsl $0 #4               
+set #1110 $0
+beq $0 $0   //from top downwards        Down to line 193. 193 - 102 = 91 = 01011011
+lsr $5 #4   //s_parity1
+lsr $0 #1
+lsr $0 #1
+lsr $0 #1	//$0 = message0(0)
+cpy $0 $1	//$1 = message0(0)
+lsr $5 #4
+lsr $0 #1
+andi $0 #1	//$0 = message0(2)
+xor $0 $1	//$0 = ^(m0(0), m0(2))
+cpy $0 $1	//$1 = ^(m0(0), m0(2))
+lsr $5 #1
+lsr $0 #1
+lsr $0 #1
+andi $0 #1	//$0 = message0(4)
+xor $0 $1	//$0 =  ^(m0(0), m0(2), m0(4))
+cpy $0 $1	//$1 =  ^(m0(0), m0(2), m0(4))
+lsr $6 #4
+lsr $0 #1
+lsr $0 #1
+lsr $0 #1	//$0 = message1(0)
+xor $0 $1	//$0 =  ^(m0(0), m0(2), m0(4), m1(0))
+cpy $0 $1	//$1 =  ^(m0(0), m0(2), m0(4), m1(0))
+lsr $6 #4
+lsr $0 #1
+andi $0 #1	//$0 = m1(2)
+xor $0 $1	//$0 = ^(m0(0), m0(2), m0(4), m1(0), m1(2))
+cpy $0 $1	//$1 = ^(m0(0), m0(2), m0(4), m1(0), m1(2))
+lsr $6 #1
+lsr $0 #1
+lsr $0 #1
+andi $0 #1	//$0 = m1(4)
+xor $0 $1	//$0 = ^(m0(0), m0(2), m0(4), m1(0), m1(2), m1(4))
+cpy $0 $1	//$1 = ^(m0(0), m0(2), m0(4), m1(0), m1(2), m1(4))
+lsr $6 #1	
+andi $0 #1	//$0 = m1(6)
+xor $0 $1	//$0 = s_p1
+add $0 $4	//$0 = 0000 s_p8 s_p4 s_p2 s_p1
+cpy $0 $4	//$4 = 0000 s_p8 s_p4 s_p2 s_p1
+andi $6 #1	//$0 = p8   //find error pointer
+lsl $0 #1	
+cpy $0 $1	//$1 = 000000 p8 0
+lsr $5 #4
+andi $0 #1	//$0 = p4
+add $0 $1	//$0 = 000000 p8 p4
+Lsl $0 #1	//$0 = 00000 p8 p4 0
+cpy $0 $1	//$1 = 00000 p8 p4 0
+lsr $5 #1
+lsr $0 #1
+andi $0 #1	//$0 = p2
+add $0 $1	//$0 = 00000 p8 p4 p2
+lsl $0 #1	//$0 = 0000 p8 p4 p2 0
+cpy $0 $1	//$1 = 0000 p8 p4 p2 0
+lsr $5 #1
+andi $0 #1	//$0 = p1
+add $0 $1	//$0 = 0000 p8 p4 p2 p1
+xor $0 $4	//$0 = 0000 S[8, 4, 2, 1] = Error pointer
+lsl $0 #1	//$0 = 000 S[8, 4, 2, 1] 0
+cpy $0 $4   //$4 = 000 S[8, 4, 2, 1] 0
+lsr $5 #1	//$0 = message0(0, 6)           //s_parity0
+xor $0 $6	//$0 = message0(0, 6) ^ message1 = 8 bit xor result
+cpy $0 $3	//$3 = 8 bit xor result
+lsl $3 #4
+lsr $0 #4	//$0 = first 4
+cpy $0 $2	//$2 = first 4
+lsr $3 #4	//$0 = last 4
+xor $0 $2	//$0 = 4 bit xor res
+cpy $0 $3	//$3 = 4 bit xor res
+andi $3 #3	//$0 = last 2
+cpy $0 $2	//$2 = last 2
+lsr $3 #1
+lsr $0 #1	//$0 = first 2
+xor $0 $2	//$0 = 2 bit xor res
+cpy $0 $3	//$3 = 2 bit xor res
+lsr $3 #1	//$0 = first 1
+cpy $0 $2	//$2 = first 1
+andi $3 #1	//$0 = last 1
+xor $0 $2	//$0 = s_p0
+xor $0 $5	//$0 = m0(0,6) S[0]
+andi $0 #1	//$0 = S[0]
+add $4 $0	//$0 = 000 S[8, 4, 2, 1, 0]
+cpy $0 $4	//$4 = 000 S[8, 4, 2, 1, 0]
+set #0000 $0            //Branch checkpoint to top
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down
+set #1001 $0               //                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsl $0 #4
+set #1100 $0
+beq $0 $0   //from bottom upwards to line 91. 188 - 91 = 97. 128 - 97 = 31. -31 2's complement = 10011111
+set #0000 $0            //Branch checkpoint to bottom
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down
+set #0100 $0                              //                                     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+lsl $0 #4
+set #0110 $0
+beq $0 $0   //from top downwards    to line 266. 266 - 196 = 70 = 01000110
+set #0000 $0    //BIT FLIP
+lsl $0 #4
+set #0001 $0	//$0 = 00000001 = mask
+cpy $0 $3	//$3 = mask
+lsr $4 #1   //Shift by S[4]
+lsr $0 #1
+lsr $0 #1
+andi $0 #1	//$0 = S[4]
+cpy $0 $2	//$2 = S[4]
+set #0000 $0
+lsl $0 #4
+set #0000 $0
+cpy $0 $1	//$1 = 0
+set #0011 $0	//Set branch distance to 3
+beq $1 $2	//if !S[4] skip shifting mask by 4	BRANCH 3
+lsl $3 #4	//$0 = shifted mask			1
+cpy $0 $3	//$3 = shifted mask			2
+lsr $4 #1       //Shift by S[2]
+lsr $0 #1
+andi $0 #1	//$0 = S[2]
+cpy $0 $2	//$2 = S[2]
+set #0000 $0
+lsl $0 #4
+set #0000 $0	//$0 = 0
+cpy $0 $1	//$1 = 0
+set #0100 $0	//Set branch distance to 4
+beq $1 $2	//if !S[2] skip shifting mask by 2	BRANCH 4
+lsl $3 #1			        	//		1
+lsl $0 #1	//$0 = shifted mask			2
+cpy $0 $3	//$3 = shifted mask			3
+lsr $4 #1       //Shift by S[1]
+andi $0 #1	//$0 = S[1]
+cpy $0 $2	//$2 = S[1]
+set #0000 $0
+lsl $0 #4
+set #0000 $0	//$0 = 0
+cpy $0 $1	//$1 = 0
+set #0011 $0	//Set branch distance to 3
+beq $1 $2	//if !S[1] skip shifting mask by 1	BRANCH 3
+lsl $3 #1	//$0 = shifted mask			1
+cpy $0 $3	//$3 = shifted mask			2
+lsr $4 #4	//$0 = S[8]     //Use S[8] to select m0 or m1
+cpy $0 $2	//$2 = S[8]
+set #0000 $0
+lsl $0 #4
+set #0000 $0	//$0 = 0
+cpy $0 $1	//$1 = 0
+set #0111 $0	//$0 = baddr	branch over m0 case
+beq $1 $2	//if !S[8] use m0		BRANCH 7        //m0 case
+xor $3 $6	//$0 = m0 w flipped bit		1
+cpy $0 $6	//$5 update m0		2
+set #0000 $0				//	3
+lsl $0 #4				//	4
+set #0011 $0	//$0 = baddr			5
+beq $0 $0	//jump past m1 case		6	JUMP 3
+xor $3 $5	//$0 = m1 w flipped bit		1
+cpy $0 $5	//$6 update m1		2
+set #0000 $0            //Branch checkpoint to top
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down
+set #1011 $0           //                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lsl $0 #4
+set #0100 $0
+beq $0 $0   //from bottom upwards to line 185. 261 - 185 = 76. 128 - 76 = 52. -52 2's complement = 10110100
+set #0000 $0            //Branch checkpoint to bottom
+lsl $0 #4
+set #0101 $0
+beq $0 $0	//branch by 5 to skip branch on the way down
+set #0100 $0                  //                                                 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+lsl $0 #4
+set #0100 $0
+beq $0 $0   //from top downwards    to line 332. 332 - 269 = 63 = 00111111
+lsr $6 #4	    //BUILD RESPONSE    //NO ERROR CASE (always executed)	first 5 = 00000
+lsr $0 #1	//$0 = RetHigh = left 3 bits of m1 = 00000 m1(0,2)
+cpy $0 $3	//$3 = left 3 bits of m1
+andi $4 #1	//$0 = S[0]     //check one error case
+cpy $0 $2	//$2 = S[0]
+set #0000 $0
+lsl $0 #4	
+set #0000 $0	//$0 = 0
+cpy $0 $1	//$1 = 0
+set #0000 $0
+lsl $0 #4
+set #1001 $0	//$0 = 9
+beq $1 $2	//skip past one error case	BRANCH 9		
+set #0100 $0	//					1   //ONE ERROR CASE	first 5 = 01000		
+lsl $0 #4	//$0 = 01000000			  2
+add $0 $3	//$0 = 01000 m1(0,2)			   3
+cpy $0 $3	//update RetHigh			     4
+set #0000 $0	//					       5
+lsl $0 #4		//				         6
+set #1111 $0	//skip past 2 error case		           7
+beq $0 $0	//				BRANCH 15      8
+lsr $4 #1	//$0 = 0000 S[8, 4, 2, 1]			1       //check two error case
+cpy $0 $2	//$2 = 0000 S[8, 4, 2, 1]			  2
+set #0000 $0	//						    3
+lsl $0 #4	//						      4
+set #0000 $0	//$0 = 0					        5
+cpy $0 $1	//$1 = 0					          6
+set #0000 $0	//						            7
+lsl $0 #4	//						              8
+set #0101 $0	//branch past 2 error case			   	    9
+beq $1 $2		//			BRANCH 5		      10		
+set #1000 $0	//					1		         11 //TWO ERROR CASE first 5 = 10000	
+lsl $0 #4	//$0 = 10000000			2			 12
+add $0 $3	//$0 = 10000 m1(0,2)			3			    13
+cpy $0 $3	//update RetHigh			4			       14
+addi $7 #-1 //STORE RETHIGH //$0 = HighRetInd = currInd-1
+cpy $0 $2	//$2 = HighRetInd
+cpy $3 $0	//$0 = RetHigh
+store $2	//mem[HighRetInd] = RetHigh
+lsl $6 #1       //Build retLow
+lsl $0 #1
+lsl $0 #1
+lsr $0 #4	//$0 = m1(3,6)
+lsl $0 #1
+lsl $0 #1
+lsl $0 #1	//$0 = 0 m1(3,6) 000	to make space for m0(0,2)
+cpy $0 $4	//$4 = 0 m1(3,6) 000
+lsr $5 #4
+lsr $0 #1	//$0 = m0(0,2)
+add $0 $4	//$0 = 0 m1(3, 6) m0(0,2)
+lsl $0 #1	//$0 = m1(3, 6) m0(0,2) 0 to make room for m0(4)
+cpy $0 $4	//$4 = m1(3, 6) m0(0,2) 0
+lsr $5 #1
+lsr $0 #1
+lsr $0 #1
+andi $0 #1	//$0 = m0(4)
+add $0 $4	//$0 = m1(3, 6) m0(0,2) m0(4) = RetLow
+cpy $0 $1   //$1 = retLow
+addi $7 #-1 //$0 = retLowInd
+addi $0 #-1 //$0 = retLowInd
+cpy $0 $2   //$2 = retLowInd
+cpy $1 $0   //$0 = retLow
+store $2
+set #1011 $0
+lsl $0 #4
+set #0010 $0
+beq $0 $0	//branch to line 258. 331 - 258 = 73. 128 - 73 = 55. -55 2's complement = 10110111

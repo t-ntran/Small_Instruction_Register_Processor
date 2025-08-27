@@ -1,0 +1,225 @@
+set #0100, $0	
+lsl $0, #4
+set #0001, $0       //set to 65
+cpy $0, $1
+set #0010, $0 
+cpy $0, $2
+set #0011, $0 
+cpy $0, $3
+set #0100, $0 
+cpy $0, $4
+set #0101, $0 
+cpy $0, $5
+set #0000, $0	
+lsl $0, #4
+set #0000, $0 
+store $1
+store $2
+store $3
+store $4
+store $5    //initialize memory
+set #0100, $0		// Begin: 	r4 = i, r3 = 65
+lsl $0, #4
+set #0001, $0       //r0 = 65
+cpy $0, $3          //r3 = 65
+load $0
+cpy $0, $4		//r4 = i
+set #0001, $0
+lsl $0, #4
+set #1111, $0
+Cpy $0, $2		//r2 = 32
+Set #0111, $0
+Lsl $0, #4
+Set #0011, $0		// set r0 to End: line 127 --> 116
+beq $4, $2	        				
+load $4		    //contents of mem[i] into r0
+cpy $0, $6		//r6 = mem[i]
+addi $4, #1		//i++, incrememted value->r0
+store $3		//store incremented i back in mem[65]
+load $0         //r0 = mem[i+1]
+cpy $0, $7		//r7 = mem[i+1]
+set #0000, $0		//make sure matched = false
+lsl $0, #4
+set #0000, $0
+cpy $0, $5
+Cpy $0, $3		//make sure midpoint passed = 0		line 30
+set #0100, $0   //reset j:
+lsl $0, #4
+set #0010, $0			
+cpy $0, $4      //address of j
+cpy $3, $0      //r0 = 0
+store $4        //j = 0
+set #0100, $0		// Inner:   mem[66] = j, check j<8      hex = 1f
+lsl $0, #4
+set #0010, $0			//set r0 = 66, address of j
+cpy $0, $4			//save &j in r4
+load $0			//get j from mem[66]            hex = 23
+addi $0, #1
+store $4		//increment j and store
+cpy $0, $4		//r4 = j (after incrementing)
+set #1001, $0		
+cpy $0, $2		// set r2 to 9 because j has already been incremented <-- should be set to 8
+Set #0100, $0
+Lsl $0, #4
+Set #0001, $0		// set r0 to InnerEnd: line 110 → set r0 to 64
+beq $4, $2		// branch if j==9
+set #0101, $2		//r2=4
+Set #0000, $0		//line 50
+Lsl $0, #4
+Set #0101, $0		// set r0 to Concat: line 58 → set r0 to 5
+beq $4, $2		    // if j=4
+Set #0000, $0
+Lsl $0, #4
+Set #0101, $0		// set r0 to NoConcat: line 62 set → set r0 to 5
+beq $1, $1		
+lsr $7, #4		// Concat:  r0 = shift b2 right 4
+or $6
+cpy $0, $6		// b1 = b1 | b2 → concat the second half of b1 with the first half of b2
+set #0001, $3		// set midpoint passed to true		
+lsr $6, #1      // NoConcat: 
+lsr $0, #1
+lsr $0, #1		// push off last 3 bits then shift back to the left
+lsl $0, #1
+lsl $0, #1
+lsl $0, #1		
+cpy $0, $2		// r2 = first 5 bits of b1
+set #0010, $0
+lsl $0, #4
+set #0000, $0
+load $0		//r0 = patternbits
+xor $0, $2	
+cpy $0, $2		// r2 = xor result
+set #0000, $0
+lsl $0, #4
+set #0000, $0   
+cpy $0, $1
+Set #0101, $0	//set r0 to Match:		
+beq $1, $2		// line 80	
+Set #0001, $0
+Lsl $0, #4		
+Set #0111, $0		// set r0 to BranchBackInner: line 106 → set r0 to 22
+beq $7, $7		    // no match found, skip rest of loop and branch back for next iteration
+set #0100, $0		// Match:   mem[69] = count_c
+lsl $0, #4
+set #0101, $0
+cpy $0, $2		//r2 = &mem[69]
+load $0		//r0 = count_c			
+addi $0, #1		//count_c++	
+store $2		//store count_c back in memory
+set #0000, $0
+lsl $0, #4
+set #0001, $0				
+Cpy $0, $1		
+Set #1010, $0		
+beq $1, $3    // if equals, midpoint passed, branch to BranchBackInner
+cpy $1, $5
+cpy $0, $0      //dummy instr
+set #0100, $0	 
+lsl $0, #4
+set #0011, $0		
+cpy $0, $1	
+load $0	
+addi $0, #1	
+store $1	
+lsl $6, #1		//shift b1 left by 1 -- added
+cpy $0, $6      //added
+Set #1011, $0	//BranchBackInner
+Lsl $0, #4
+Set #0011, $0	
+beq $1, $1	
+Set #0000, $0	    //inner end
+Lsl $0, #4		
+Set #0001, $0
+cpy $0, $2      //added
+set #0011, $0      //added
+beq $2, $5		
+Set #1000, $0	
+Beq $1, $1		
+set #0100, $0   		
+Lsl $0, #4		
+Set #0100, $0
+Cpy $0, $1
+Load $0	
+Addi $0, #1	
+Store $1	
+Set #1000, $0       //BranchBackOuter
+Lsl $0, #4
+Set #0001, $0	
+Beq $0, $0
+set #0001, $0
+lsl $0, #4
+set #1111, $0
+load $0
+cpy $0, $6      //r6 = mem[31]
+set #0010, $0
+lsl $0, #4
+set #0000, $0
+load $0
+cpy $0, $7      //r7 = patternbits
+set #0000, $0
+lsl $0, #4
+set #0000, $0
+cpy $0, $5      //r5 = counter
+cpy $0, $3      //r3 = match
+set #0000, $0   //loop begin
+lsl $0, #4
+set #0100, $0 
+cpy $0, $2
+set #0010, $0
+lsl $0, #4
+set #1001, $0   //set to end address
+beq $2, $5
+lsr $6, #1      // NoConcat: 
+lsr $0, #1
+lsr $0, #1		// push off last 3 bits then shift back to the left
+lsl $0, #1
+lsl $0, #1
+lsl $0, #1		
+cpy $0, $2		// r2 = first 5 bits of b1
+xor $0, $7	
+cpy $0, $2		// r2 = xor result
+set #0000, $0
+lsl $0, #4
+set #0000, $0   
+cpy $0, $1
+Set #0101, $0	//set r0 to Match:
+beq $2, $1
+set #0000, $0
+lsl $0, #4
+set #1110, $0
+beq $0, $0  //branch to the end of the loop
+set #0100, $0		// Match:   mem[69] = count_c
+lsl $0, #4
+set #0101, $0
+cpy $0, $2		//r2 = &mem[69]
+load $0		//r0 = count_c			
+addi $0, #1		//count_c++	
+store $2
+set #0011, $2     //added
+cpy $2, $2      //added
+load $2         //added
+addi $0, #1     //added
+store $2        //added
+set #0001, $3   //r3 = match = 1
+addi $5, #1
+cpy $0, $5
+lsl $6, #1      //branch back
+cpy $0, $6
+set #1101, $0       
+lsl $0, #4
+set #0001, $0
+beq $0, $0
+set #0000, $0   //loop end
+lsl $0, #4
+set #0000, $0
+cpy $0, $2
+set #1001, $0
+beq $3, $2
+set #0100, $0		// count_b
+lsl $0, #4
+set #0100, $0
+cpy $0, $2		
+load $0			
+addi $0, #1		//count_b++	
+store $2
+cpy $0, $0

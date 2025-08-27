@@ -1,0 +1,302 @@
+set #0000, $0
+lsl $0, #4          //r0=0
+cpy $0, $7          //r7 = 0
+set #0000, $0       //label begin
+lsl $0, #4
+addi $0, #15			
+addi $0, #15		// # iterations -> 30
+cpy $0, $6
+set #0101, $0
+lsl $0, #4
+set #1110, $0       //r0 = branch destination branch 94
+beq $7, $6		//if( i == 30)
+load $7
+cpy $0, $2             //r2 = mem[0]
+addi $7, #1			//increment counter by 1
+cpy $0, $7
+load $7
+cpy $0, $3          //r3 = mem[1]
+lsr $2, #4			//begin parity 8 -> r0 = message0(0,3)
+xor $3, $0			//r0 = 4 bits xor result
+cpy $0, $4			//$4 = 4 bits xor result
+lsr $4, #1			//$0 = 2 bits to xor
+lsr $0, #1
+cpy $0, $1			//$1 = first 2 bits to xor
+andi $4,#3			//$0 = last 2 bits to xor
+xor $0, $1			//$0 = 2 bits xor result
+cpy $0, $4			//$4 = 2 bit xor result
+lsr $4, #1			//$0 = first 1 bit to xor
+cpy $0, $5			//$2 = last 1 bit to xor
+andi $4, #1			//$0 = 1 bit to xor
+xor $0, $5			//$0 = p8 final result
+cpy $0, $4			//$4 = p8
+set #0100, $1		//$1 = 00000100
+lsl $1, #4			//$0 = 01000000
+cpy $0, $1			//$1 = 01000001
+set #0001, $1			//$1 = &mem[65] = 0100 0001
+cpy $4, $0			//$0 = $4
+store $1			//mem[65] = p8
+lsl $2, #4			//begin parity 4 -> remove message0(0, 3)
+lsr $0, #4			//message0(4,6) by removing message0(7)
+lsr $0, #1			//$0 = message0(4,6)
+cpy $0, $6			//$6 = message0(4,6)
+lsr $2, #4			//lsr $0, #1
+lsr $0, #1
+lsr $0, #1			
+lsr $0, #1			//shift right by 7
+xor $6, $0			//$0 = message0(4,6) ^ message(0) 3 bit xor result
+xor $0, $3			//message1 ^ (message0(4,6) ^ message(0))= 0 0 0 0 0 c1 c2 c3
+cpy $0, $6
+lsr $6, #1
+lsr $0, #1			// isolates c1
+cpy $0, $1
+andi $6, #3			//isolates c2 c3
+xor $0, $1			//(c1, c2)^(c3) = 0 0 0 0 0 0 C1 C2
+cpy $0, $6          //r6 = 2 bit xor result
+lsr $6, #1			//isolate C1
+cpy $0, $1          //r1 = C1
+andi $6, #1			//isolate C2
+xor $1, $0		// xored
+cpy $0, $5
+set #0100, $1			//$1 = 00000100
+lsl $1, #4			//$0 = 01000000
+cpy $0, $1			//$1 = 01000000
+set #0010, $1			//$1 = &mem[66] = 0100 0010
+cpy $5, $0			//$0 = $5
+store $1			//mem[66] = p4
+lsl $2, #4          //begin parity2
+lsr $0, #4
+lsr $0, #1
+lsr $0, #1  
+cpy $0, $4	                //$4 = message0(4,5)
+lsl  $2, #4
+lsl $0, #1
+lsl $0, #1
+lsl $0, #1
+lsr $0, #4
+lsr $0, #1
+lsr $0, #1
+lsr $0, #1		//message0(7)
+xor $0, $4		
+cpy $0, $4		//r4 = message0(4,5) ^ message0(7)
+lsl $2, #1
+lsr $0, #4
+lsr $0, #1
+lsr $0, #1		//r0 = message0(1,2)
+xor $0, $4
+cpy $0, $4		//r4 = message0(4,5) ^ message0(7) ^ message0(1,2) = 2 bit xor result
+lsl $3, #4
+lsl $0, #1
+lsr $0, #4
+lsr $0, #1
+lsr $0, #1		//r4 = message1(5,6) 
+xor $0, $4		
+cpy $0, $4		//r4 = message0(4,5) ^ message0(7) ^ message0(1,2) ^ message1(5,6) = 0 0 0 0 0 0 c1 c2
+lsr $4, #1		//isolates c1
+cpy $0, $5		//r5 = c1
+andi $4, #1		//isolate c2
+xor $0, $5
+cpy $0, $4		//r4 = parity2
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0011, $1			//r1 = &mem[66] = 0100 0011
+cpy $4, $0			//r0 = r4
+store $1			//mem[67] = p2
+set #0000, $1   
+lsl $1, #4
+addi $0, #15
+addi $0, #15
+cpy $0, $6          //r6 = 30
+set #0111, $0
+lsl $0, #4
+set #1000, $0   
+beq $7, $6      //if r7 = 30 & r6 = 30 continue from top branch jump by 120
+set #0000, $1
+set #1000, $0
+lsl $0, #4
+set #1101, $0   
+beq $1, $6      //if r1 = 255 & r6 = 255 continue from top branch jump by -115
+store $1			//mem[67] = p2
+andi $2, #3		//begin parity1 - >r0 = message0(6,7)
+cpy $0, $6		//r6 = message0(6,7)
+lsl $2, #1
+lsl $0, #1
+lsl $0, #1		
+lsr $0, #4
+lsr $0, #1
+lsr $0, #1		//r0=message0(3,4)
+xor $6, $0		//message0(3,4) ^ message(6,7) = 0 0 0 0 0 0 c1 c2
+cpy $0, $6
+lsr $6, #1		//isolate c1
+cpy $0, $1
+andi $6, #1		//isolate c2
+xor $0, $1		
+cpy $0, $1      //r1 = 1 bit xor result
+lsl $2, #1
+lsr $0, #4		//message0(1)
+lsr $0, #1
+lsr $0, #1
+lsr $0, #1
+xor $1, $0
+cpy $0, $1      //r1 = message0(3,4) ^ message0(6,7) ^ message0(1) = 1 bit xor result
+andi $3, #1		//message1(7)
+xor $0, $1	
+cpy $0, $1      // //r1 = message0(3,4) ^ message0(6,7) ^ message0(1) ^ message1(7) = 1 bit xor result
+lsr $3, #1		//message1(5)
+lsr $0, #1
+xor $0, $1      //r1 = r1 ^ message1(5)
+cpy $0, $4
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0100, $1			//r1 = &mem[68] = 0100 1000
+cpy $4, $0			//r0 = r3
+store $1			//mem[68] = p1
+set #0100, $1		//parity0 -> r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0001, $1			//r1 = &mem[65] = 0100 0001
+load $1	
+cpy $0, $4			//r4 = parity8
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0010, $1			//r1 = &mem[66] = 0100 0001
+load $1	
+cpy $0, $5			//r5 = parity4
+xor $4, $5
+cpy $0, $4			//r4 = p8^p4
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0011, $1			//r1 = &mem[67] = 0100 0011
+load $1	
+cpy $0, $5			//r5 = p2
+xor $4, $5
+cpy $0, $4			//r4 = p8^p4^p2
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0100, $1			//r1 = &mem[68] = 0100 0100
+load $1	
+cpy $0, $5			//r5 = parity1
+xor $4, $5
+cpy $0, $4			//r4 = p8^p4^p2^p1 = p0
+xor $2, $3		//xor message0 and message1
+cpy $0, $5
+lsr $0, #4		//upper 4 bits
+cpy $0, $6      //r6 = upper 4 bits
+lsl $5, #4
+lsr $0, #4		//r0 = lower 4 bits
+xor $0, $6		//4 bits left  0000xxxx
+cpy $0, $5       //r5 = 4 bit xor result		
+lsr $0, #1
+lsr $0, #1   
+cpy $0, $6      //r6 = upper 2 bits
+andi $5, #3     //lower two bits		
+xor $0, $6		//2 bits lefts  000000xx
+cpy $0, $5      //r5 = 2 bit xor result 000000C1C2
+lsr $0, #1          
+cpy $0, $6		//r6 = C1
+andi $5, #1     //r0 = C2
+xor $0, $6		//1 bit left
+xor $0, $4		//p0
+cpy $0, $4
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0101, $1			//r1 = &mem[69] = 0100 1001
+cpy $4, $0			//r0 = r3
+store $1			//mem[69] = p0
+lsl $3, #1      //ret31 = msw r0 = 0 0 0 0 0 b11 b10 b9
+lsl $0, #4      //r0 = b11 b10 b9 0 0 0 0 0
+cpy $0, $5
+lsr $2, #1
+lsr $0, #1
+lsr $0, #1
+or $5           //r0 = b11 b10 b9 b8 b7 b6 b5 x 
+lsr $0, #1
+lsl $0, #1
+cpy $0, $5		//r5 = b11 b10 b9 b8 b7 b6 b5 0
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0001, $1			//r1 = &mem[65] = 0100 0001
+load $1         //r0 = p8
+or $5           //r0 = p8 | r5
+cpy $0, $5			//r5 = ret31
+set #0000, $1
+set #1000, $0
+lsl $0, #4
+set #1011, $0   
+beq $1, $6      //if r1 = 255 & r6 = 255 continue from top branch jump -117
+set #0000, $1   
+lsl $1, #4
+addi $0, #15
+addi $0, #15
+cpy $0, $6          //r6 = 30
+set #0011, $0
+lsl $0, #4
+set #1100, $0   
+beq $7, $6      //if r7 = 30 & r6 = 30 continue from top branch jump by 60			
+lsr $2, #1	    //ret30 = lsw -> get rid of b1				
+lsl $0, #4  
+lsl $0, #1
+cpy $0, $6	    //r6 = message0(2,4)
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0010, $1			//r1 = &mem[66] = 0100 0010
+load $1			//r1 = p4
+lsl $0, #4	    //get P4 in position 5
+or $6	
+cpy $0, $6	    //r6 = message0(2,4) + P4
+andi $2, #1
+lsl $0, #1
+lsl $0, #1
+lsl $0, #1      //get b1 in correct position
+or $6	
+cpy $0, $6      //r6 = message0(2,4) + P4 + b1
+set #0100, $1			//r1 = 00000100
+lsl $1, #4		//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0011, $1			//r1 = &mem[67] = 0100 0011
+load $1			//r1 = p2
+lsl $0, #1
+lsl $0, #1	    //get P2 in position 
+or $6
+cpy $0, $6	    //r6 = message0(2,4) + P4 + b1 + P2
+set #0100, $1			//r1 = 00000100
+lsl $1, #4			//r0 = 01000000
+cpy $0, $1			//r1 = 01000000
+set #0100, $1			//r1 = &mem[68] = 0100 0100
+load $1
+lsl $0, #1
+or $6
+cpy $0, $6              //r6 = message0(2,4) + P4 + b1 + P2 + P1
+cpy $4, $0
+xor $4, $6
+cpy $0, $6    //r6 = message0(2,4) + P4 + b1 + P2 + P1 + P0 = ret30
+cpy $7, $1
+addi $1, #15
+addi $0, #15    //r0 = #31
+cpy $0, $1
+cpy $5, $0
+store $1       //mem[31] = r5 = ret31
+addi $1, #-1
+cpy $0, $1      //r1 = 30
+cpy $6, $0
+store $1       //mem[30] = r6 = ret330
+addi $7, #1
+cpy $0, $7	    //increase counter by 2: i = 2
+set #1111, $1
+lsl $1, #4
+set #1111, $0
+cpy $0, $1      //r1 = 255
+cpy $1, $6     //r6 = 255
+set #1011, $0       //set r0 = -69
+lsl $0, #4
+set #1001, $0		//set r0 to address 5
+beq $1, $6        //jump back -71
+cpy $0, $0      //dummy statement to signify end of loop
